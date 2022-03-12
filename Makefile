@@ -1,21 +1,25 @@
-CXXFLAGS = -Wall -O2 -lstdc++fs
+CXXFLAGS = -Wall -O2
 MAGICKFLAGS = `Magick++-config --cxxflags --cppflags --ldflags --libs`
+LDFLAGS = -lstdc++fs
 
-SRC = $(wildcard *.cpp)
-OBJ = $(SRC:.cpp=.o)
+SRC_DIR := src
+OBJ_DIR := obj
+EXE := patterns
+SRC = $(wildcard $(SRC_DIR)/*.cpp)
+OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
-patterns: $(OBJ)
-	$(CXX) $(CXXFLAGS) $(MAGICKFLAGS) $(OBJ) -o $@
+.PHONY: all clean
 
-main.o: main.cpp
+all: $(EXE)
+
+$(EXE): $(OBJ)
+	$(CXX) $(CXXFLAGS) $(MAGICKFLAGS) $(LDFLAGS) $^ -o $@
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) $(MAGICKFLAGS) -c $< -o $@
 
-mandelbrot.o: mandelbrot.cpp mandelbrot.h
-	$(CXX) $(CXXFLAGS) $(MAGICKFLAGS) -c $< -o $@
+$(OBJ_DIR):
+	mkdir -p $@
 
-img.o: img.cpp img.h
-	$(CXX) $(CXXFLAGS) $(MAGICKFLAGS) -c $< -o $@
-
-.PHONY: clean
 clean:
-	rm -vf $(OBJ)
+	rm -rvf $(EXE) $(OBJ_DIR)

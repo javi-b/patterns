@@ -59,3 +59,6 @@ patterns
 
 # Output files
 output/*
+
+# Cppcheck
+cppcheck-build-dir/*
