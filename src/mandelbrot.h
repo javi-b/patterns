@@ -1,37 +1,35 @@
 #pragma once
 
 #include <complex>
-#include "img.h"
+#include "pattern.h"
 using namespace std;
 
 /**
- * Mandelbrot pattern class.
+ * Mandelbrot pattern derived class.
  */
-class Mandelbrot {
+class Mandelbrot : public Pattern {
 public:
-    /// Pattern config data structure.
+    /// Mandelbrot pattern config data structure.
     struct Cfg {
-        int width, height; // Image's size.
-        double ar; // Image's aspect ratio.
         double x, y; // Mandelbrot position center.
         double zoom; // Mandelbrot zoom.
         int max_n; // Max number of iterations to check mandelbrot point.
 
         // constructor
-        Cfg(const int height, const double ar,
-                const double x, const double y, const double zoom,
+        Cfg(const double x, const double y, const double zoom,
                 const int max_n);
     };
 
+    // constructor
+    Mandelbrot(const int height, const double aspect_ratio,
+            const Cfg & cfg);
+
     // public functions
-    void GenerateImg(const string & dir, const string & name, Cfg & cfg);
+    void GenerateMatrix();
 
 private:
-    Cfg * cfg_; ///< Pointer to current config data structure.
+    Cfg cfg_; ///< Config data structure.
 
     // helper functions
-    double * GenerateMatrix();
     long GetMandelbrotValue(const complex<double> c);
-    void NormalizeMatrix(double * matrix, const int w, const int h,
-            const double min, const double max);
 };
