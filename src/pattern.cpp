@@ -20,25 +20,6 @@ Pattern::~Pattern() {
 }
 
 /**
- * Generates pattern image.
- */
-void Pattern::GenerateImg(const string & dir, const string & name) {
-
-    // creates img
-    Img img(width_, height_);
-
-    // draws matrix in img
-    img.DrawMatrixBW(matrix_, true);
-
-    // applies filters
-    img.Normalize();
-    img. Blur();
-
-    // writes img to file
-    img.Write(dir, name);
-}
-
-/**
  * Normalizes matrix to values from 0.0 to 1.0.
  */
 void Pattern::NormalizeMatrix(const double min, const double max ) {

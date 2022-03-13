@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Magick++.h>
+#include "utils.h"
 using namespace std;
 
 /**
@@ -8,12 +9,31 @@ using namespace std;
  */
 class Img {
 public:
-    // constructor
+    /// Embellished Points config data structure.
+    struct EmbellishedPointsCfg {
+        double angle_offset; ///< Angle offset from heading to arcs.
+        double curvature; ///< Arcs curvature.
+        double length; ///< Arcs length.
+        bool symmetric; ///< Whether if 2 arcs are symmetric.
+
+        // constructor
+        EmbellishedPointsCfg(const double angle_offset,
+                const double curvature, const double length,
+                const bool symmetric);
+    };
+
+    // constructors
     Img(const int width, const int height);
+    Img(const int width, const int height, const string & color);
 
     // public functions
 
     void DrawMatrixBW(double * matrix, const bool inverse);
+
+    void DrawPoints(const vector<utils::Point> & points,
+            const string & color);
+    void DrawEmbellishedPoints(const vector<utils::Point> & points,
+            const string & color, const EmbellishedPointsCfg & cfg);
 
     void DrawLine(const float start_x, const float start_y,
             const float end_x, const float end_y, const string & color);

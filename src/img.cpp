@@ -4,14 +4,33 @@
 #include "img.h"
 
 /**
+ * Embellished Points config data structure constructor.
+ */
+Img::EmbellishedPointsCfg::EmbellishedPointsCfg(const double angle_offset,
+        const double curvature, const double length, const bool symmetric)
+    : angle_offset(angle_offset), curvature(curvature), length(length),
+        symmetric(symmetric) {}
+
+/**
  * Constructor.
- * Creates the image and sets its background.
+ * Creates the image and sets a transparent background.
  */
 Img::Img(const int width, const int height)
     : width_(width), height_(height) {
 
     img_ = Magick::Image(Magick::Geometry(width_, height_),
             Magick::Color(0, 0, 0, 0));
+}
+
+/**
+ * Constructor.
+ * Creates the image and sets a specific color background.
+ */
+Img::Img(const int width, const int height, const string & color)
+    : width_(width), height_(height) {
+
+    img_ = Magick::Image(Magick::Geometry(width_, height_),
+            Magick::Color(color));
 }
 
 /**
@@ -39,6 +58,85 @@ void Img::DrawMatrixBW(double * matrix, const bool inverse) {
 }
 
 /**
+ * Draws collection of points to image.
+ */
+void Img::DrawPoints(const vector<utils::Point> & points,
+        const string & color) {
+
+    cout << "Drawing " << points.size() << " points to image..." << endl;
+
+    vector<Magick::Drawable> draw_list;
+
+    img_.strokeColor(Magick::Color(color));
+    for (const auto & p : points)
+        draw_list.push_back(Magick::DrawablePoint(p.x, p.y));
+
+    img_.draw(draw_list);
+}
+
+/**
+ * Draws collection of points to image. However, it draws them embellished.
+ * For each point it draws two arcs following the config parametres.
+ */
+void Img::DrawEmbellishedPoints(const vector<utils::Point> & points,
+        const string & color, const EmbellishedPointsCfg & cfg) {
+
+    cout << "Drawing " << points.size()
+            << " embellished points to image..." << endl;
+
+    img_.strokeWidth(0.5);
+    img_.strokeColor(Magick::Color(color));
+    img_.fillColor(Magick::Color(0, 0, 0, 0));
+
+    vector<Magick::VPath> path;
+
+    for (int i = 1; i < int(points.size()); i++) {
+
+        // calculates arcs angles
+        const double heading_angle = atan2(points[i].y - points[i - 1].y,
+                points[i].x - points[i - 1].x),
+            arc_a_angle = heading_angle + utils::Radians(cfg.angle_offset),
+            arc_b_angle = heading_angle - utils::Radians(cfg.angle_offset);
+
+        // calculates arcs end points
+        const utils::Point end_point_a(cfg.length * cos(arc_a_angle),
+                cfg.length * sin(arc_a_angle)),
+            end_point_b(cfg.length * cos(arc_b_angle),
+                cfg.length * sin(arc_b_angle));
+
+        // calculates arcs control points
+        const utils::Point control_point_a(
+                end_point_a.x / 2.0 + cfg.length * cfg.curvature
+                    * cos(arc_a_angle - M_PI / 2.0),
+                end_point_a.y / 2.0 + cfg.length * cfg.curvature
+                    * sin(arc_a_angle - M_PI / 2.0));
+        const utils::Point control_point_b(
+                end_point_b.x / 2.0 + cfg.length * cfg.curvature
+                    * cos(arc_b_angle
+                        + ((cfg.symmetric) ? M_PI : -M_PI) / 2.0),
+                end_point_b.y / 2.0 + cfg.length * cfg.curvature
+                    * sin(arc_b_angle
+                        + ((cfg.symmetric) ? M_PI : -M_PI) / 2.0));
+
+        // adds arc a to path
+        path.push_back(Magick::PathMovetoAbs(
+                    Magick::Coordinate(points[i].x, points[i].y)));
+        path.push_back(Magick::PathQuadraticCurvetoRel(
+                    Magick::PathQuadraticCurvetoArgs(control_point_a.x,
+                        control_point_a.y, end_point_a.x, end_point_a.y)));
+
+        // adds arc b to path
+        path.push_back(Magick::PathMovetoAbs(
+                    Magick::Coordinate(points[i].x, points[i].y)));
+        path.push_back(Magick::PathQuadraticCurvetoRel(
+                    Magick::PathQuadraticCurvetoArgs(control_point_b.x,
+                        control_point_b.y, end_point_b.x, end_point_b.y)));
+    }
+
+    img_.draw(Magick::DrawablePath(path));
+}
+
+/**
  * Draws line on image.
  */
 void Img::DrawLine(const float start_x, const float start_y,
@@ -46,7 +144,6 @@ void Img::DrawLine(const float start_x, const float start_y,
 
     img_.strokeColor(Magick::Color(color));
     img_.draw(Magick::DrawableLine(start_x, start_y, end_x, end_y));
-
 }
 
 /**
@@ -85,5 +182,4 @@ void Img::Write(const string & dir, const string & name) {
     } else {
         cerr << "Error: could not open " << path << endl;
     }
-    
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <complex>
+#include "utils.h"
 #include "pattern.h"
 using namespace std;
 
@@ -21,15 +22,13 @@ public:
     };
 
     // constructor
-    Mandelbrot(const int height, const double aspect_ratio,
-            const Cfg & cfg);
+    Mandelbrot(const int height, const double aspect_ratio);
 
     // public functions
-    void GenerateMatrix();
+    void GeneratePattern(const Cfg & cfg);
+    void GenerateImg(const string & dir, const string & name);
 
 private:
-    Cfg cfg_; ///< Config data structure.
-
     // helper functions
-    long GetMandelbrotValue(const complex<double> c);
+    long GetMandelbrotValue(const complex<double> c, const int max_n);
 };
