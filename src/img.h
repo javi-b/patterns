@@ -11,15 +11,24 @@ class Img {
 public:
     /// Embellished Points config data structure.
     struct EmbellishedPointsCfg {
+        /// Heading types enumeration.
+        enum Heading {
+            kHeadingNatural,
+            kHeadingSin, kHeadingStrongSin, kHeadingChaosSin,
+            kHeadingNaturalSin, kHeadingNaturalStrongSin,
+            kHeadingNaturalChaosSin
+        };
+
         double angle_offset; ///< Angle offset from heading to arcs.
         double curvature; ///< Arcs curvature.
         double length; ///< Arcs length.
         bool symmetric; ///< Whether if 2 arcs are symmetric.
+        Heading heading; ///< Heading type.
 
         // constructor
         EmbellishedPointsCfg(const double angle_offset,
                 const double curvature, const double length,
-                const bool symmetric);
+                const bool symmetric, const Heading heading);
     };
 
     // constructors

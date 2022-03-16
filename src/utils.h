@@ -31,4 +31,12 @@ inline double Radians(const double degrees) {
     return (degrees * M_PI / 180.0);
 }
 
+/**
+ * Converts degrees to radians.
+ */
+inline double Degrees(const double radians) {
+
+    return (radians * 180.0 / M_PI);
+}
+
 }

@@ -7,9 +7,10 @@
  * Embellished Points config data structure constructor.
  */
 Img::EmbellishedPointsCfg::EmbellishedPointsCfg(const double angle_offset,
-        const double curvature, const double length, const bool symmetric)
+        const double curvature, const double length, const bool symmetric,
+        const Heading heading)
     : angle_offset(angle_offset), curvature(curvature), length(length),
-        symmetric(symmetric) {}
+        symmetric(symmetric), heading(heading) {}
 
 /**
  * Constructor.
@@ -93,10 +94,42 @@ void Img::DrawEmbellishedPoints(const vector<utils::Point> & points,
     for (int i = 1; i < int(points.size()); i++) {
 
         // calculates arcs angles
-        const double heading_angle = atan2(points[i].y - points[i - 1].y,
-                points[i].x - points[i - 1].x),
-            arc_a_angle = heading_angle + utils::Radians(cfg.angle_offset),
-            arc_b_angle = heading_angle - utils::Radians(cfg.angle_offset);
+        double heading_angle = 0.0;
+        switch (cfg.heading) {
+        case EmbellishedPointsCfg::kHeadingNatural:
+            heading_angle =
+                utils::Degrees(atan2(points[i].y - points[i - 1].y,
+                            points[i].x - points[i - 1].x));
+              break;
+        case EmbellishedPointsCfg::kHeadingSin:
+            heading_angle = 360 * abs(sin(i));
+            break;
+        case EmbellishedPointsCfg::kHeadingStrongSin:
+            heading_angle = 360 * abs(sin(i * 2));
+            break;
+        case EmbellishedPointsCfg::kHeadingChaosSin:
+            heading_angle = 360 * abs(sin(i * 10));
+            break;
+        case EmbellishedPointsCfg::kHeadingNaturalSin:
+            heading_angle = 360 * abs(sin(i))
+                - utils::Degrees(atan2(points[i].y - points[i - 1].y,
+                            points[i].x - points[i - 1].x));
+            break;
+        case EmbellishedPointsCfg::kHeadingNaturalStrongSin:
+            heading_angle = 360 * abs(sin(i * 2))
+                - utils::Degrees(atan2(points[i].y - points[i - 1].y,
+                            points[i].x - points[i - 1].x));
+            break;
+        case EmbellishedPointsCfg::kHeadingNaturalChaosSin:
+            heading_angle = 360 * abs(sin(i * 10))
+                - utils::Degrees(atan2(points[i].y - points[i - 1].y,
+                            points[i].x - points[i - 1].x));
+            break;
+        }
+        const double arc_a_angle =
+            utils::Radians(heading_angle + cfg.angle_offset);
+        const double arc_b_angle =
+            utils::Radians(heading_angle - cfg.angle_offset);
 
         // calculates arcs end points
         const utils::Point end_point_a(cfg.length * cos(arc_a_angle),
