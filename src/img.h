@@ -47,6 +47,9 @@ public:
     void DrawLine(const float start_x, const float start_y,
             const float end_x, const float end_y, const string & color);
 
+    void DrawPolygons3D(const vector<utils::Polygon3D> & polygons,
+            const utils::Camera3D & camera, const string & color);
+
     void Normalize();
     void Blur(const double radius = 1.0, const double sigma = 0.5);
 

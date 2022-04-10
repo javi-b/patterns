@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "mandelbrot.h"
 #include "lissajous.h"
+#include "polytope.h"
 
 /**
  * Generates Mandelbrot pattern image.
@@ -39,10 +40,10 @@ void GenerateLissajous() {
 
     const Img::EmbellishedPointsCfg embellished_cfg(
         0.0, // angle offset
-        5.0, // curvature
+        3.0, // curvature
         10.0, // length
         true, // symmetric
-        Img::EmbellishedPointsCfg::kHeadingNatural // heading type
+        Img::EmbellishedPointsCfg::kHeadingNaturalStrongSin // heading type
     );
     char name[100];
     sprintf(name, "lissajous_%.0f-%.0f_%.0f-%.0f_%.0f-%.0f-%.0f-%s-%d.png",
@@ -55,12 +56,23 @@ void GenerateLissajous() {
 }
 
 /**
+ * Generate Polytope pattern image.
+ */
+void GeneratePolytope() {
+
+    Polytope polytope(600, 1.0 / 1.0);
+    polytope.GeneratePattern();
+    polytope.GenerateImg("output", "polytope.png");
+}
+
+/**
  * Main function.
  */
 int main() {
 
     //GenerateMandelbrot();
-    GenerateLissajous();
+    //GenerateLissajous();
+    GeneratePolytope();
 
     return 0;
 }

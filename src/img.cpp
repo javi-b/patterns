@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <filesystem>
+#include <climits>
 #include "img.h"
 
 /**
@@ -177,6 +178,33 @@ void Img::DrawLine(const float start_x, const float start_y,
 
     img_.strokeColor(Magick::Color(color));
     img_.draw(Magick::DrawableLine(start_x, start_y, end_x, end_y));
+}
+
+/**
+ * Draw collection of Polygons in a 3D space.
+ */
+void Img::DrawPolygons3D(const vector<utils::Polygon3D> & polygons,
+        const utils::Camera3D & camera, const string & color) {
+
+    img_.strokeWidth(0.5);
+    img_.strokeColor(Magick::Color(color));
+
+    for (const auto & polygon : polygons) {
+
+        vector<Magick::Coordinate> coordinates;
+
+        for (const auto & point_3d : polygon.points) {
+
+            const auto point = Projection(point_3d, camera);
+            coordinates.push_back(Magick::Coordinate(point.x, point.y));
+        }
+
+        const int r = rand();
+        img_.fillColor(Magick::Color((r % 100) / 100.0 * USHRT_MAX,
+                    ((r + 33) % 100) / 100.0 * USHRT_MAX,
+                    ((r + 66) % 100) / 100.0 * USHRT_MAX, 0.1 * USHRT_MAX));
+        img_.draw(Magick::DrawablePolygon(coordinates));
+    }
 }
 
 /**

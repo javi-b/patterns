@@ -21,7 +21,7 @@ protected:
     // Only one should be used, each derived Pattern class uses one.
     double * matrix_; // Pattern pixels matrix (values from 0.0 to 1.0).
     vector<utils::Point> points_; // Vector of points that form the pattern.
-    vector<utils::Line> lines_; // Vector of lines that form the pattern.
+    vector<utils::Polygon3D> polygons_3d_; // Vector of 3D space polygons.
 
     // helper functions
     void NormalizeMatrix(const double min, const double max);
